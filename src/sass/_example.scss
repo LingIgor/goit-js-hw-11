@@ -26,3 +26,15 @@
   background-size: cover;
   background-position: center;
 }
+
+.is-hidden{
+  opacity: 0;
+}
+
+.gallery{
+ width: 1600px;
+display: flex;
+margin-right: 20px;
+flex-wrap: wrap;
+gap:10px;
+}
