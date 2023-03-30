@@ -32,9 +32,82 @@
 }
 
 .gallery{
- width: 1600px;
+//  width: 1600px;
 display: flex;
 margin-right: 20px;
 flex-wrap: wrap;
 gap:10px;
+// outline: 2px red solid;
+margin: 0 auto;
+padding: 60px 100px;
+}
+
+.photo-card {
+  margin: 0 auto;  
+  background-color: rgba(212, 212, 199, 0.3);
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.12), 0px 1px 1px rgba(0, 0, 0, 0.14),
+    0px 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.load-more {
+  
+  margin: 0 auto 30 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: blue;
+  background-color: rgb(228, 243, 11);
+  border: blue 3px solid;
+  border-radius: 10px 10px;
+    min-width: 150px;
+  height: 40px;
+}
+
+.load-more:is(:hover,:focus),
+form > button:is(:hover,:focus) {
+  background-color: rgb(11, 243, 50);
+}
+
+form > input:is(:hover, :focus) {
+  border: rgb(11, 243, 50) 2px solid;
+}
+
+img {
+  border-radius: 0 0 6px 6px;
+}
+
+.info-item {
+  padding-left: 15px;
+}
+
+form > button:disabled {
+background-color: rgba(143, 168, 236, 0.2);
+}
+
+.search-form {
+  
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+form > input {
+  border: yellow 3px solid;
+  background-color: rgba(143, 168, 236, 0.2);
+  min-width: 400px;
+  height: 40px;
+  border-radius: 10px 10px;
+  padding-left: 10px;
+}
+
+form > button {
+  color: blue;
+  background-color: rgb(228, 243, 11);
+  border: blue 3px solid;
+  border-radius: 10px 10px;
+  margin-left: 30px;
+  min-width: 150px;
+  height: 40px;
 }

@@ -1,63 +1,81 @@
-import axios from 'axios'
+import axios from 'axios';
 import Notiflix from 'notiflix';
-import SimpleLightbox from "simplelightbox";
-import "simplelightbox/dist/simple-lightbox.min.css";
-import { FetchForMyHW } from './axiosFetch'
+import { FetchForMyHW } from './axiosFetch';
+import throttle from 'lodash.throttle';
 
-const fetchFor = new FetchForMyHW()
-const formEL = document.querySelector('#search-form')
-const btnSubmitEl = document.querySelector('button')
-const divEl = document.querySelector('.gallery')
-const btnLoadEl = document.querySelector('.load-more')
-btnLoadEl.classList.add('is-hidden')
+const fetchFor = new FetchForMyHW();
+const formEL = document.querySelector('#search-form');
+const btnSubmitEl = document.querySelector('button');
+const divEl = document.querySelector('.gallery');
+const btnLoadEl = document.querySelector('.load-more');
+const THROTLE_TIME = 300;
 
+btnLoadEl.classList.add('is-hidden');
+btnSubmitEl.setAttribute('disabled', true);
 
+formEL.addEventListener('submit', throttle(onBtnSubmit, THROTLE_TIME));
+btnLoadEl.addEventListener('click', throttle(onBtnLoadClick, THROTLE_TIME));
+formEL.addEventListener('input', onBtnInput);
 
-formEL.addEventListener('submit', onBtnSubmit)
+function onBtnInput(e) {
+  fetchFor.querry = e.target.value.trim();
+  console.log(fetchFor.querry);
+  fetchFor.querry
+    ? btnSubmitEl.removeAttribute('disabled')
+    : btnSubmitEl.setAttribute('disabled', true);
+}
 
-function onBtnSubmit (e) {
-    e.preventDefault()
-    fetchFor.page =1
-    divEl.innerHTML =''
-    fetchFor.querry = e.target.elements.searchQuery.value
-    fetchFor.axiosReturn().then(data => {
-      console.log(data.data)
-      makeMurkup(data.data.hits)
-      
-      if(data.data.hits.length === 0) {
-        
-        Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
-        return
-      }      
+function onBtnSubmit(e) {
+  e.preventDefault();
+  fetchFor.page = 1;
+  divEl.innerHTML = '';
+  fetchFor.querry = e.target.elements.searchQuery.value.trim();
+  fetchFor
+    .axiosReturn()
+    .then(({ data }) => {
+      console.log(data);
+      makeMurkup(data.hits);
+
+      if (data.hits.length === 0) {
+        Notiflix.Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+        btnLoadEl.classList.add('is-hidden');
+        return;
+      }
+
+      if (fetchFor.page * fetchFor.per_page > data.totalHits) {
+        Notiflix.Notify.warning(
+          "We're sorry, but you've reached the end of search results."
+        );
+        btnLoadEl.classList.add('is-hidden');
+        return;
+      }
     })
-   
+    .catch(err => {
+      console.log(err);
+    });
 }
 
-
-btnLoadEl.addEventListener('click', onBtnLoadClick) 
-
-function onBtnLoadClick (e) {
-  
-  fetchFor.page +=1
-  fetchFor.axiosReturn().then(data => {
-    console.log(data.data)
-    makeMurkup(data.data.hits)
-    if( fetchFor.page * fetchFor.per_page > data.data.totalHits){
-        
-      Notiflix.Notify.warning("We're sorry, but you've reached the end of search results.") 
-      btnLoadEl.classList.add('is-hidden')
-    }
-     })
-     
-    
+function onBtnLoadClick(e) {
+  fetchFor.page += 1;
+  fetchFor
+    .axiosReturn()
+    .then(({ data }) => {
+      console.log(data);
+      makeMurkup(data.hits);
+    })
+    .catch(err => {
+      console.log(err);
+    });
 }
 
-
-function makeMurkup (data) {
-    const murkup = data.map(({webformatURL, tags, likes, views, comments, downloads}) => 
-    `<div class="photo-card">
-    <img src="${webformatURL}" alt="${tags}" loading="lazy" width = 250px height=150px/>
-    <div class="info">
+function makeMurkup(data) {
+  const murkup = data.map(
+    ({ webformatURL, tags, likes, views, comments, downloads }) =>
+      `<div class="photo-card">      
+    <img src="${webformatURL}" alt="${tags}" loading="lazy" width = 300px height=200px/>
+   <div class="info">
       <p class="info-item">
         <b>Likes: ${likes}</b>
       </p>
@@ -71,12 +89,9 @@ function makeMurkup (data) {
         <b>Downloads: ${downloads}</b>
       </p>
     </div>
-  </div>`)
-  
+  </div>`
+  );
 
-  divEl.insertAdjacentHTML('beforeend', murkup)
-  btnLoadEl.classList.remove('is-hidden')
+  divEl.insertAdjacentHTML('beforeend', murkup);
+  // btnLoadEl.classList.remove('is-hidden');
 }
-
-
-
