@@ -27,6 +27,10 @@
   background-position: center;
 }
 
+a {
+  text-decoration: none;
+}
+
 .is-hidden{
   opacity: 0;
 }
@@ -77,8 +81,16 @@ img {
   border-radius: 0 0 6px 6px;
 }
 
+.info {
+  display: flex;
+}
+
 .info-item {
+  display: flex;
+  flex-direction: column;
+    align-items: center;
   padding-left: 15px;
+  color: black;
 }
 
 form > button:disabled {
