@@ -18,6 +18,7 @@ btnSubmitEl.setAttribute('disabled', true);
 formEL.addEventListener('submit', onBtnSubmit);
 btnLoadEl.addEventListener('click', debounce(onBtnLoadClick, TIME));
 formEL.addEventListener('input', onBtnInput);
+// window.addEventListener('scroll', infinityScroll);
 
 function onBtnInput(e) {
   fetchFor.querry = e.target.value.trim();
@@ -114,7 +115,24 @@ function noMoreResult(totalHits) {
     Notiflix.Notify.warning(
       "We're sorry, but you've reached the end of search results."
     );
-    // btnLoadEl.classList.add('is-hidden');
+    btnLoadEl.classList.add('is-hidden');
     return;
   }
 }
+
+//--------This IS infinity scroll. You can use this cod if you want and
+// ---------- I will be that this cod be here for my future!!!!!!!!!!
+
+// async function infinityScroll() {
+//   const docRect = document.documentElement.getBoundingClientRect();
+//   if (docRect.bottom < document.documentElement.clientHeight + 200) {
+//     fetchFor.page++;
+//     try {
+//       const { data } = await fetchFor.axiosReturn();
+//       makeMurkup(data.hits);
+//       noMoreResult(data.totalHits);
+//     } catch (err) {
+//       console.log(err);
+//     }
+//   }
+// }
