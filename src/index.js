@@ -5,7 +5,6 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import { FetchForMyHW } from './axiosFetch';
 import { debounce } from 'debounce';
 
-
 const fetchFor = new FetchForMyHW();
 const formEL = document.querySelector('#search-form');
 const btnSubmitEl = document.querySelector('button');
@@ -28,63 +27,65 @@ function onBtnInput(e) {
     : btnSubmitEl.setAttribute('disabled', true);
 }
 
-function onBtnSubmit(e) {
+async function onBtnSubmit(e) {
   e.preventDefault();
   fetchFor.page = 1;
   divEl.innerHTML = '';
   fetchFor.querry = e.target.elements.searchQuery.value.trim();
- 
-  fetchFor
-    .axiosReturn()
-    .then(({ data }) => {
-      console.log(data);
-      makeMurkup(data.hits);
-
-      if (data.hits.length === 0) {
-        Notiflix.Notify.failure(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-        btnLoadEl.classList.add('is-hidden');
-        return;
-      }    
-
-      if (fetchFor.page * fetchFor.per_page > data.totalHits) {
-        Notiflix.Notify.warning(
-          "We're sorry, but you've reached the end of search results."
-        );
-        btnLoadEl.classList.add('is-hidden');
-        return;
-      }
-
-      if(data.hits.length > 0) {
-        Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`)
   
-      }
-    })
-    .catch(err => {
-      console.log(err);
-    });
+  try {
+  const { data } = await fetchFor.axiosReturn();
+  console.log(data);
+  makeMurkup(data.hits);
+  if (data.hits.length === 0) {
+    Notiflix.Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+    btnLoadEl.classList.add('is-hidden');
+    return;
+  }    
+  
+  if (fetchFor.page * fetchFor.per_page > data.totalHits) {
+    Notiflix.Notify.warning(
+      "We're sorry, but you've reached the end of search results."
+    );
+    btnLoadEl.classList.add('is-hidden');
+    return;
+  }
+  
+  if (data.hits.length > 0) {
+    Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`)
+  }
+  } catch (err) {
+console.log(err);
+}
 }
 
-function onBtnLoadClick(e) {
+async function onBtnLoadClick() {
   fetchFor.page += 1;
-  fetchFor
-    .axiosReturn()
-    .then(({ data }) => {
-      console.log(data);
-      makeMurkup(data.hits);
-    })
-    .catch(err => {
-      console.log(err);
-    });
+  try {
+  const {data} = await fetchFor.axiosReturn()
+  makeMurkup(data.hits);
+  noMoreResult(data.totalHits);
+      
+  }catch (err) {
+console.log(err);   
+}
 }
 
 function makeMurkup(data) {
-  
-
-  const murkup = data.map(
-    ({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) =>
-      `<div class="photo-card"> 
+  const murkup = data
+    .map(
+      ({
+        webformatURL,
+        largeImageURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) =>
+        `<div class="photo-card"> 
       <a class="gallery__item" href="${largeImageURL}"/>   
       <img src="${webformatURL}" alt="${tags}" loading="lazy" width = 350px height=200px/>
    <div class="info">
@@ -102,7 +103,8 @@ function makeMurkup(data) {
       </p>
     </div>
   </div>`
-  ).join('');
+    )
+    .join('');
 
   divEl.insertAdjacentHTML('beforeend', murkup);
   btnLoadEl.classList.remove('is-hidden');
@@ -113,4 +115,14 @@ function makeMurkup(data) {
     captionDelay: 250,
     scrollZoom: false,
   });
+}
+
+function noMoreResult(totalHits) {
+  if (fetchFor.page * fetchFor.per_page > totalHits) {
+    Notiflix.Notify.warning(
+      "We're sorry, but you've reached the end of search results."
+    );
+    btnLoadEl.classList.add('is-hidden');
+    return;
+  }
 }
