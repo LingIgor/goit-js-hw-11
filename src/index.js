@@ -20,8 +20,7 @@ btnLoadEl.addEventListener('click', debounce(onBtnLoadClick, TIME));
 formEL.addEventListener('input', onBtnInput);
 
 function onBtnInput(e) {
-  fetchFor.querry = e.target.value.trim();
-  console.log(fetchFor.querry);
+  fetchFor.querry = e.target.value.trim();  
   fetchFor.querry
     ? btnSubmitEl.removeAttribute('disabled')
     : btnSubmitEl.setAttribute('disabled', true);
