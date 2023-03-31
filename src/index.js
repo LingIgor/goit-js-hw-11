@@ -32,45 +32,37 @@ async function onBtnSubmit(e) {
   fetchFor.page = 1;
   divEl.innerHTML = '';
   fetchFor.querry = e.target.elements.searchQuery.value.trim();
-  
+
   try {
-  const { data } = await fetchFor.axiosReturn();
-  console.log(data);
-  makeMurkup(data.hits);
-  if (data.hits.length === 0) {
-    Notiflix.Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
-    btnLoadEl.classList.add('is-hidden');
-    return;
-  }    
-  
-  if (fetchFor.page * fetchFor.per_page > data.totalHits) {
-    Notiflix.Notify.warning(
-      "We're sorry, but you've reached the end of search results."
-    );
-    btnLoadEl.classList.add('is-hidden');
-    return;
-  }
-  
-  if (data.hits.length > 0) {
-    Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`)
-  }
+    const { data } = await fetchFor.axiosReturn();
+    makeMurkup(data.hits);
+    noMoreResult(data.totalHits);
+
+    if (!data.hits.length) {
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      btnLoadEl.classList.add('is-hidden');
+      return;
+    }   
+
+    if (data.hits.length > 0) {
+      Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+    }
   } catch (err) {
-console.log(err);
-}
+    console.log(err);
+  }
 }
 
 async function onBtnLoadClick() {
   fetchFor.page += 1;
   try {
-  const {data} = await fetchFor.axiosReturn()
-  makeMurkup(data.hits);
-  noMoreResult(data.totalHits);
-      
-  }catch (err) {
-console.log(err);   
-}
+    const { data } = await fetchFor.axiosReturn();
+    makeMurkup(data.hits);
+    noMoreResult(data.totalHits);
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 function makeMurkup(data) {
@@ -118,7 +110,7 @@ function makeMurkup(data) {
 }
 
 function noMoreResult(totalHits) {
-  if (fetchFor.page * fetchFor.per_page > totalHits) {
+  if (fetchFor.page * fetchFor.per_page > totalHits && totalHits !== 0) {
     Notiflix.Notify.warning(
       "We're sorry, but you've reached the end of search results."
     );
