@@ -3,20 +3,21 @@ import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import { FetchForMyHW } from './axiosFetch';
-import throttle from 'lodash.throttle';
+import { debounce } from 'debounce';
+
 
 const fetchFor = new FetchForMyHW();
 const formEL = document.querySelector('#search-form');
 const btnSubmitEl = document.querySelector('button');
 const divEl = document.querySelector('.gallery');
 const btnLoadEl = document.querySelector('.load-more');
-const THROTLE_TIME = 1000;
+const TIME = 400;
 
 btnLoadEl.classList.add('is-hidden');
 btnSubmitEl.setAttribute('disabled', true);
 
-formEL.addEventListener('submit', throttle(onBtnSubmit, THROTLE_TIME));
-btnLoadEl.addEventListener('click', throttle(onBtnLoadClick, THROTLE_TIME));
+formEL.addEventListener('submit', onBtnSubmit);
+btnLoadEl.addEventListener('click', debounce(onBtnLoadClick, TIME));
 formEL.addEventListener('input', onBtnInput);
 
 function onBtnInput(e) {
@@ -32,6 +33,7 @@ function onBtnSubmit(e) {
   fetchFor.page = 1;
   divEl.innerHTML = '';
   fetchFor.querry = e.target.elements.searchQuery.value.trim();
+ 
   fetchFor
     .axiosReturn()
     .then(({ data }) => {
@@ -53,6 +55,11 @@ function onBtnSubmit(e) {
         btnLoadEl.classList.add('is-hidden');
         return;
       }
+
+      if(data.hits.length > 0) {
+        Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`)
+  
+      }
     })
     .catch(err => {
       console.log(err);
@@ -73,9 +80,7 @@ function onBtnLoadClick(e) {
 }
 
 function makeMurkup(data) {
-  // Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`)
-
-  // console.log(totalHits)
+  
 
   const murkup = data.map(
     ({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) =>
@@ -97,7 +102,7 @@ function makeMurkup(data) {
       </p>
     </div>
   </div>`
-  );
+  ).join('');
 
   divEl.insertAdjacentHTML('beforeend', murkup);
   btnLoadEl.classList.remove('is-hidden');
