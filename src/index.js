@@ -56,6 +56,7 @@ async function onBtnSubmit(e) {
 
 async function onBtnLoadClick() {
   fetchFor.page += 1;
+  // btnLoadEl.classList.add('is-hidden');
   try {
     const { data } = await fetchFor.axiosReturn();
     makeMurkup(data.hits);

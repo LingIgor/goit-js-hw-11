@@ -105,7 +105,8 @@ img {
 }
 
 form > button:disabled {
-background-color: rgba(136, 139, 150, 0.2);
+background-color: rgba(136, 139, 150, 0.5);
+border: rgba(15, 50, 177, 0.5) 3px solid;
 }
 
 .search-form {
