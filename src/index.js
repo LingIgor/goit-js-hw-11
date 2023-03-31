@@ -20,7 +20,7 @@ btnLoadEl.addEventListener('click', debounce(onBtnLoadClick, TIME));
 formEL.addEventListener('input', onBtnInput);
 
 function onBtnInput(e) {
-  fetchFor.querry = e.target.value.trim();  
+  fetchFor.querry = e.target.value.trim();
   fetchFor.querry
     ? btnSubmitEl.removeAttribute('disabled')
     : btnSubmitEl.setAttribute('disabled', true);
@@ -31,7 +31,7 @@ async function onBtnSubmit(e) {
   fetchFor.page = 1;
   divEl.innerHTML = '';
   fetchFor.querry = e.target.elements.searchQuery.value.trim();
-
+  btnLoadEl.classList.add('is-hidden');
   try {
     const { data } = await fetchFor.axiosReturn();
     makeMurkup(data.hits);
@@ -41,12 +41,12 @@ async function onBtnSubmit(e) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
-      btnLoadEl.classList.add('is-hidden');
       return;
-    }   
+    }
 
     if (data.hits.length > 0) {
       Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+      btnLoadEl.classList.remove('is-hidden');
     }
   } catch (err) {
     console.log(err);
@@ -55,7 +55,7 @@ async function onBtnSubmit(e) {
 
 async function onBtnLoadClick() {
   fetchFor.page += 1;
-  // btnLoadEl.classList.add('is-hidden');
+
   try {
     const { data } = await fetchFor.axiosReturn();
     makeMurkup(data.hits);
@@ -99,7 +99,7 @@ function makeMurkup(data) {
     .join('');
 
   divEl.insertAdjacentHTML('beforeend', murkup);
-  btnLoadEl.classList.remove('is-hidden');
+
   var lightbox = new SimpleLightbox('.gallery a', {
     captionSelector: 'img',
     captionsData: 'alt',
@@ -114,7 +114,7 @@ function noMoreResult(totalHits) {
     Notiflix.Notify.warning(
       "We're sorry, but you've reached the end of search results."
     );
-    btnLoadEl.classList.add('is-hidden');
+    // btnLoadEl.classList.add('is-hidden');
     return;
   }
 }
